@@ -9,6 +9,6 @@ The tool will not modify your original PCSX2 data without your knowledge, if you
 
 If you occur any problems, or have ideas for improvments, let me know.
 
-I'll put a precompiled version for Windows @releases.
+I'll put a precompiled version for Windows @releases. If you want to compile it yourself, you need a C++11 Compiler and wxWidgets 3.0 dev files, tell me if you need more information.
 
 makefile(s) will be added
