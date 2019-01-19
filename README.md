@@ -9,7 +9,8 @@ The tool will not modify your original PCSX2 data without your knowledge, if you
 
 If you occur any problems, or have ideas for improvments, let me know.
 
-I'll put precompiled versions for Windows here:https://github.com/XXXBold/PCSX2_MultiConfigTool/releases. If you want to compile it yourself, you need a C++11 Compiler and wxWidgets 3.0 dev files. To edit the GUI, use https://github.com/wxFormBuilder/wxFormBuilder for editing PCSX2Tool.fbp. 
+I'll put precompiled versions for Windows here: https://github.com/XXXBold/PCSX2_MultiConfigTool/releases. 
+If you want to compile it yourself, you need a C++11 Compiler and wxWidgets 3.0 dev files. To edit the GUI, use https://github.com/wxFormBuilder/wxFormBuilder for editing PCSX2Tool.fbp and use the generated C++ Source in the Project.
 Tell me if you need help or more information.
 
 Please apologize if something won't work as expected, that's my first Project in C++ :P
