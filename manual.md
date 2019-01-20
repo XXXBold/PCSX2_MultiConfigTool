@@ -5,9 +5,9 @@ At the First Start, you need to set up some Paths to make it work correctly.
   The Path where you've stored the .iso Files.
 - PCSX2-Exe-Path: 
   Locate your Executable (pcsx2.exe), This Path will be used when Starting PCSX2 over the tool or when you create a new Game Shortcut.
-- Configs Path (PCSX2)
+- Configs Path (PCSX2):
   Your current (default) "inis" Folder, created and used per default from PCSX2. This will be the "Default" entry in your configs List.
-- Configs Path (User)  
+- Configs Path (User):  
   The Path where you want to store new Configurations, this must be an empty Folder, or, if you used the Tool before, the previous used location.
   
 After Selecting all Paths, you can Manage your configs. The <Default> entry refers to your original PCSX2 Config, which cannot be deleted bby the tool.
