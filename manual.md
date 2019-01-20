@@ -10,7 +10,7 @@ At the First Start, you need to set up some Paths to make it work correctly.
 - Configs Path (User):  
   The Path where you want to store new Configurations, this must be an empty Folder, or, if you used the Tool before, the previous used location.
   
-After Selecting all Paths, you can Manage your configs. The "Default" entry refers to your original PCSX2 Config, which cannot be deleted bby the tool.
+After Selecting all Paths, you can Manage your configs. The "Default" entry refers to your original PCSX2 Config, which cannot be deleted by the tool.
 If you click "Create new Config", an Input will open, allowing you to specify the new config's Name. 
 After "Save", the data from your previously selected config are copied to the new config.
 
