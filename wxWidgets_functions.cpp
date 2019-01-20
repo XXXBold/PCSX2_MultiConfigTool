@@ -13,7 +13,11 @@ bool browseForFolder(const wxString &description,
                      wxWindow *parent,
                      const wxString &defaultPath)
 {
-  wxDirDialog pathSelector(parent,description,defaultPath,wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+  wxDirDialog pathSelector(parent,
+                           description,
+                           defaultPath,
+                           wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(pathSelector.ShowModal() == wxID_CANCEL)
     return(false);     // the user changed idea...
   outPath=pathSelector.GetPath();
@@ -33,6 +37,7 @@ bool browseForFile(bool openFile,
                             "",
                             fileSelectionMask,
                             (openFile)?wxFD_OPEN|wxFD_FILE_MUST_EXIST:wxFD_SAVE);
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(fileSelector.ShowModal() == wxID_CANCEL)
     return(false);
   outPath=fileSelector.GetPath();
@@ -47,6 +52,7 @@ bool copyFolderContents(const wxString &srcPath,
   wxString strSrcPath, strDestPath, strName, strExt;
   strSrcPath=srcPath;
   strDestPath=destPath;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
 
   if(!strSrcPath.EndsWith(wxFILE_SEP_PATH))
     strSrcPath.append(wxFILE_SEP_PATH);
@@ -83,7 +89,7 @@ bool copyFolderContents(const wxString &srcPath,
 bool deleteFolderRecursive(const wxString &path)
 {
   wxString strPath=path;
-
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(path.Last()!=wxFILE_SEP_PATH)
     strPath.append(wxFILE_SEP_PATH);
   return(wxDir::Remove(strPath,wxPATH_RMDIR_RECURSIVE));
@@ -93,7 +99,7 @@ bool checkPCSX2CFGPathValid(const wxString &path)
 {
   wxFileSystem fileIterator;
   wxString strPath=path;
-
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(path.Last()!=wxFILE_SEP_PATH)
     strPath.append(wxFILE_SEP_PATH);
 
@@ -108,6 +114,7 @@ bool createUserConfigIndicator(const wxString &path)
   wxFileSystem fileIterator;
   wxString strPath=path;
   wxFile newFile;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(path.Last()!=wxFILE_SEP_PATH)
     strPath.append(wxFILE_SEP_PATH);
   strPath.append(FILE_CONFIG_INDICATOR);
@@ -125,6 +132,7 @@ int checkUserCFGPathValid(const wxString &path)
   wxFileSystem fileIterator;
   wxString strPath=path;
   wxString strCurrFolder;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(path.Last()!=wxFILE_SEP_PATH)
     strPath.append(wxFILE_SEP_PATH);
   if(!wxDir::Exists(strPath))
@@ -144,6 +152,7 @@ bool getSubFoldersFromPath(const wxString &path,
 {
   wxFileSystem fileIterator;
   wxString strCurrFolder;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(!wxDir::Exists(path))
     return(false);
   fileIterator.ChangePathTo(path);

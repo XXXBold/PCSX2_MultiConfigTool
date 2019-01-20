@@ -31,10 +31,18 @@ public:
   string GetUserCFGPath();
   string GetToolCFGPath();
 
+  bool GetOptionStartNoGUI(void);
+  bool GetOptionStartFullScreen(void);
+  bool GetOptionStartFullBoot(void);
+
   void SetPCSX2GamesPath(const string &path);
   void SetPCSX2ExePath(const string &path);
   void SetPCSX2CFGPath(const string &path);
   void SetUserCFGPath(const string &path);
+
+  void SetOptionStartNoGUI(bool noGUI);
+  void SetOptionStartFullScreen(bool fullscreen);
+  void SetOptionStartFullBoot(bool fullboot);
 
   void CreateCommandLine_PCSX2StartWithCFG(const string &configName,
                                            const string &gamePath,
@@ -43,16 +51,27 @@ public:
   void CreateCommandLine_PCSX2StartWithCFG(const string &configName,
                                            string &cmdLine);
 private:
+  /* Paths */
   string strToolCFGPath;
   string strPCSX2GamesPath;
   string strPCSX2EXEPath;
   string strPCSX2CFGPath;
   string strUserCFGPath;
+  /* Options */
+  bool bOptionStartNoGUI;
+  bool bOptionStartFullscreen;
+  bool bOptionStartFullBoot;
+  /* Section/Keys for paths */
   const char *pcSectionPaths;
   const char *pcKeyPCSX2GamesPath;
   const char *pcKeyPCSX2EXE;
   const char *pcKeyPCSX2CFG;
   const char *pcKeyUserCFG;
+  /* Section/Keys for Options */
+  const char *pcSectionOptions;
+  const char *pcKeyStartPCSX2GUI;
+  const char *pcKeyStartFullScreen;
+  const char *pcKeyStartFullBoot;
 
   Inifile appCFGFile;
 };

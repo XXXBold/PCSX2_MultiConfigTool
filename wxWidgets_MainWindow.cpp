@@ -11,10 +11,13 @@
 enum
 {
   // menu items
-  MainWindow_EditCFGs           = wxID_EDIT,
-  MainWindow_About              = wxID_ABOUT,
-  MainWindow_CreateGameShortcut = 1,
-  MainWindow_OpenPathConfig     = 2,
+  MainWindow_EditCFGs                     = wxID_EDIT,
+  MainWindow_About                        = wxID_ABOUT,
+  MainWindow_OptionsStartNoGUI            =1,
+  MainWindow_OptionsStartEnableFullscreen ,
+  MainWindow_OptionsStartEnableFullBoot   ,
+  MainWindow_CreateGameShortcut           ,
+  MainWindow_OpenPathConfig               ,
 };
 
 enum /* Buttons */
@@ -28,15 +31,19 @@ enum /* Buttons */
 };
 
 wxBEGIN_EVENT_TABLE(wxWinMain,wxFrame)
-EVT_MENU(MainWindow_About,wxWinMain::OnAbout)
-EVT_MENU(MainWindow_OpenPathConfig,wxWinMain::OnPathSelect)
-EVT_MENU(MainWindow_CreateGameShortcut,wxWinMain::OnShortcutCreate)
+EVT_MENU(MainWindow_About,                        wxWinMain::OnAbout)
+EVT_MENU(MainWindow_OpenPathConfig,               wxWinMain::OnPathSelect)
+EVT_MENU(MainWindow_CreateGameShortcut,           wxWinMain::OnShortcutCreate)
 
-EVT_BUTTON(BTN_NewConfig,wxWinMain::OnNewConfig)
-EVT_BUTTON(BTN_NewConfigSave,wxWinMain::OnNewConfigSave)
-EVT_BUTTON(BTN_NewConfigCancel,wxWinMain::OnNewConfigCancel)
-EVT_BUTTON(BTN_ConfigDelete,wxWinMain::OnConfigDelete)
-EVT_BUTTON(BTN_ConfigStartPCSX2,wxWinMain::OnEditConfig)
+EVT_MENU(MainWindow_OptionsStartNoGUI,            wxWinMain::OnOptionChangeStartNoGUI)
+EVT_MENU(MainWindow_OptionsStartEnableFullscreen, wxWinMain::OnOptionChangeStartFullscreen)
+EVT_MENU(MainWindow_OptionsStartEnableFullBoot,   wxWinMain::OnOptionChangeStartFullBoot)
+
+EVT_BUTTON(BTN_NewConfig,                         wxWinMain::OnNewConfig)
+EVT_BUTTON(BTN_NewConfigSave,                     wxWinMain::OnNewConfigSave)
+EVT_BUTTON(BTN_NewConfigCancel,                   wxWinMain::OnNewConfigCancel)
+EVT_BUTTON(BTN_ConfigDelete,                      wxWinMain::OnConfigDelete)
+EVT_BUTTON(BTN_ConfigStartPCSX2,                  wxWinMain::OnEditConfig)
 
 EVT_CLOSE(wxWinMain::OnClose)
 wxEND_EVENT_TABLE()
@@ -51,6 +58,7 @@ bool PCSX2Tool_GUI::OnInit()
   wxString path=::wxStandardPaths::Get().GetUserConfigDir();
   wxFileName newFolder= wxFileName::DirName(path);
   path+= wxFILE_SEP_PATH + pcsx2Tool_m->toolGetAppName();
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(!wxApp::OnInit())
     return(false);
 
@@ -160,15 +168,31 @@ wxWinMain::wxWinMain(wxWindow* parent,
   this->SetSizer( layCFGEdit );
   this->Layout();
   m_menubar2 = new wxMenuBar( 0 );
-  m_menu3 = new wxMenu();
+  menuFile = new wxMenu();
   wxMenuItem* menuItemOpenPathsCfg;
-  menuItemOpenPathsCfg = new wxMenuItem( m_menu3, MainWindow_OpenPathConfig, wxString( wxT("Set Paths...") ) , wxEmptyString, wxITEM_NORMAL );
-  m_menu3->Append( menuItemOpenPathsCfg );
+  menuItemOpenPathsCfg = new wxMenuItem( menuFile, MainWindow_OpenPathConfig, wxString( wxT("Set Paths...") ) , wxEmptyString, wxITEM_NORMAL );
+  menuFile->Append( menuItemOpenPathsCfg );
 
-  menuItemCreateGameShortcut = new wxMenuItem( m_menu3, MainWindow_CreateGameShortcut, wxString( wxT("Create Game Start Shortcut...") ) , wxEmptyString, wxITEM_NORMAL );
-  m_menu3->Append( menuItemCreateGameShortcut );
+  menuItemCreateGameShortcut = new wxMenuItem( menuFile, MainWindow_CreateGameShortcut, wxString( wxT("Create Game Start Shortcut...") ) , wxEmptyString, wxITEM_NORMAL );
+  menuFile->Append( menuItemCreateGameShortcut );
 
-  m_menubar2->Append( m_menu3, wxT("&File") );
+  m_menubar2->Append( menuFile, wxT("&File") );
+
+  menuOptions = new wxMenu();
+  menuSubGameShortcuts = new wxMenu();
+  wxMenuItem* menuSubGameShortcutsItem = new wxMenuItem( menuOptions, wxID_ANY, wxT("Game Shortcuts"), wxEmptyString, wxITEM_NORMAL, menuSubGameShortcuts );
+  menuItemEnableStartNoGUI = new wxMenuItem( menuSubGameShortcuts, MainWindow_OptionsStartNoGUI, wxString( wxT("Disable PCSX2-GUI on Startup") ) , wxEmptyString, wxITEM_CHECK );
+  menuSubGameShortcuts->Append( menuItemEnableStartNoGUI );
+
+  menuItemEnableStartFullscreen = new wxMenuItem( menuSubGameShortcuts, MainWindow_OptionsStartEnableFullscreen, wxString( wxT("Start in Fullscreen") ) , wxEmptyString, wxITEM_CHECK );
+  menuSubGameShortcuts->Append( menuItemEnableStartFullscreen );
+
+  menuItemEnableStartFullBoot = new wxMenuItem( menuSubGameShortcuts, MainWindow_OptionsStartEnableFullBoot, wxString( wxT("Use Full Boot on Startup") ) , wxEmptyString, wxITEM_CHECK );
+  menuSubGameShortcuts->Append( menuItemEnableStartFullBoot );
+
+  menuOptions->Append( menuSubGameShortcutsItem );
+
+  m_menubar2->Append( menuOptions, wxT("&Options") );
 
   menuHelp = new wxMenu();
   wxMenuItem* menuItemAbout;
@@ -183,11 +207,34 @@ wxWinMain::wxWinMain(wxWindow* parent,
   this->Centre( wxBOTH );
 }
 
+void wxWinMain::UpdateConfigList()
+{
+  wxArrayString astrFolders;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
+  astrFolders.Add(DEFAULT_CONFIG_STRING);
+  if(!getSubFoldersFromPath(pcsx2Tool_m->GetUserCFGPath(),&astrFolders))
+  {
+    wxPuts("No folders found in usercfg");
+  }
+  for(unsigned int uiIndex=0;uiIndex<astrFolders.GetCount();++uiIndex)
+  {
+    wxPuts("Folder: " + astrFolders[uiIndex]);
+
+  }
+  this->listGameConfigs->Clear();
+  this->listGameConfigs->InsertItems(astrFolders,0);
+  this->listGameConfigs->SetSelection(0);
+}
+
 bool wxWinMain::Show(bool show)
 {
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(show)
   {
-    if((!this->wxPathCfg->bUserCFGValid) || (!this->wxPathCfg->bPCSX2CFGValid))
+    this->menuItemEnableStartNoGUI->Check(pcsx2Tool_m->GetOptionStartNoGUI());
+    this->menuItemEnableStartFullscreen->Check(pcsx2Tool_m->GetOptionStartFullScreen());
+    this->menuItemEnableStartFullBoot->Check(pcsx2Tool_m->GetOptionStartFullBoot());
+    if(!this->wxPathCfg->PathConfigIsValid())
     {
       wxPuts("User/pcsx2 CFG path invalid!");
       this->menuItemCreateGameShortcut->Enable(false);
@@ -208,6 +255,7 @@ bool wxWinMain::Show(bool show)
 
 void wxWinMain::OnPathSelect(wxCommandEvent& WXUNUSED(event))
 {
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   this->wxPathCfg->Show(true);
 }
 
@@ -218,6 +266,7 @@ void wxWinMain::OnShortcutCreate(wxCommandEvent& WXUNUSED(event))
   string strCMDLine;
   wxFile newFile;
   int iIndex;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if((iIndex=this->listGameConfigs->GetSelection())==wxNOT_FOUND)
     return;
   if(!browseForFile(true,"Select .iso file of the game",strPath,".iso-Files (*.iso)|*.iso",this,pcsx2Tool_m->GetPCSX2GamesPath()))
@@ -229,9 +278,9 @@ void wxWinMain::OnShortcutCreate(wxCommandEvent& WXUNUSED(event))
   else
     strConfigName="";
   pcsx2Tool_m->CreateCommandLine_PCSX2StartWithCFG(strConfigName.ToStdString(),strPath.ToStdString(),strCMDLine);
-  wxPuts("Get cmdline: " + strCMDLine);
+  wxPuts("Got cmdline: " + strCMDLine);
   if(!browseForFile(false,
-                    "Save Shortcut",
+                    "Save Shortcut for " + strPath,
                     strPath,
 #ifdef _WIN32
                     ".bat Files (*.bat)|*.bat",
@@ -255,27 +304,27 @@ void wxWinMain::OnShortcutCreate(wxCommandEvent& WXUNUSED(event))
   newFile.Close();
 }
 
-void wxWinMain::OnClose(wxCloseEvent& WXUNUSED(event))
+void wxWinMain::OnOptionChangeStartNoGUI(wxCommandEvent& WXUNUSED(event))
 {
-  if(!pcsx2Tool_m->SaveToolConfig())
-  {
-    wxMessageDialog confirmMe(this,
-                              wxString::Format("Failed to save tool configuration to %s, Quit anyway?",pcsx2Tool_m->GetToolCFGPath()),
-                              wxMessageBoxCaptionStr,
-                              wxYES_NO);
-    switch(confirmMe.ShowModal())
-    {
-      case wxID_NO:
-        return;
-      case wxID_YES:
-        break;
-    }
-  }
-  this->Destroy();
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
+  pcsx2Tool_m->SetOptionStartNoGUI(this->menuItemEnableStartNoGUI->IsChecked());
+}
+
+void wxWinMain::OnOptionChangeStartFullscreen(wxCommandEvent& WXUNUSED(event))
+{
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
+  pcsx2Tool_m->SetOptionStartFullScreen(this->menuItemEnableStartFullscreen->IsChecked());
+}
+
+void wxWinMain::OnOptionChangeStartFullBoot(wxCommandEvent& WXUNUSED(event))
+{
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
+  pcsx2Tool_m->SetOptionStartFullBoot(this->menuItemEnableStartFullBoot->IsChecked());
 }
 
 void wxWinMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   wxMessageBox("Welcome to the " + pcsx2Tool_m->toolGetAppName() + " Version " + pcsx2Tool_m->toolGetVersionString() + "!\n"
                "\n"
                "This is a Tool to manage multiple Configs for PCSX2\n"
@@ -291,6 +340,7 @@ void wxWinMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 void wxWinMain::OnNewConfig(wxCommandEvent& WXUNUSED(event))
 {
   int iIndex;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if((iIndex=this->listGameConfigs->GetSelection())==wxNOT_FOUND)
     return;
 
@@ -309,29 +359,12 @@ void wxWinMain::OnNewConfig(wxCommandEvent& WXUNUSED(event))
   this->txtNewCFGName->SetSelection(0,this->txtNewCFGName->GetLineLength(0));
 }
 
-void wxWinMain::UpdateConfigList()
-{
-  wxArrayString astrFolders;
-  astrFolders.Add(DEFAULT_CONFIG_STRING);
-  if(!getSubFoldersFromPath(pcsx2Tool_m->GetUserCFGPath(),&astrFolders))
-  {
-    wxPuts("No folders found in usercfg");
-  }
-  for(unsigned int uiIndex=0;uiIndex<astrFolders.GetCount();++uiIndex)
-  {
-    wxPuts("Folder: " + astrFolders[uiIndex]);
-
-  }
-  this->listGameConfigs->Clear();
-  this->listGameConfigs->InsertItems(astrFolders,0);
-  this->listGameConfigs->SetSelection(0);
-}
-
 void wxWinMain::OnNewConfigSave(wxCommandEvent& WXUNUSED(event))
 {
   int iIndex;
   wxString strSrcPath;
   wxString strDestPath;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if((iIndex=this->listGameConfigs->GetSelection())==wxNOT_FOUND)
     return;
 
@@ -357,6 +390,7 @@ void wxWinMain::OnNewConfigSave(wxCommandEvent& WXUNUSED(event))
 
 void wxWinMain::OnNewConfigCancel(wxCommandEvent& WXUNUSED(event))
 {
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   this->txtNewCFGName->Show(false);
   this->btnNewConfigSave->Show(false);
   this->btnNewConfigCancel->Show(false);
@@ -366,6 +400,7 @@ void wxWinMain::OnConfigDelete(wxCommandEvent& WXUNUSED(event))
 {
   int iIndex;
   wxString strPath;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(((iIndex=this->listGameConfigs->GetSelection())==wxNOT_FOUND) || (iIndex==0)) /* Don't allow default to be deleted */
     return;
 
@@ -391,6 +426,7 @@ void wxWinMain::OnEditConfig(wxCommandEvent& WXUNUSED(event))
   if((iIndex=this->listGameConfigs->GetSelection())==wxNOT_FOUND)
     return;
 
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   pcsx2Tool_m->CreateCommandLine_PCSX2StartWithCFG((iIndex)?this->listGameConfigs->GetString(iIndex).ToStdString():"",
                                  strCmd);
 
@@ -405,4 +441,22 @@ void wxWinMain::OnEditConfig(wxCommandEvent& WXUNUSED(event))
   }
 }
 
-
+void wxWinMain::OnClose(wxCloseEvent& WXUNUSED(event))
+{
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
+  if(!pcsx2Tool_m->SaveToolConfig())
+  {
+    wxMessageDialog confirmMe(this,
+                              wxString::Format("Failed to save tool configuration to %s, Quit anyway?",pcsx2Tool_m->GetToolCFGPath()),
+                              wxMessageBoxCaptionStr,
+                              wxYES_NO);
+    switch(confirmMe.ShowModal())
+    {
+      case wxID_NO:
+        return;
+      case wxID_YES:
+        break;
+    }
+  }
+  this->Destroy();
+}

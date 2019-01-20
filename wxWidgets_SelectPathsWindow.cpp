@@ -134,11 +134,16 @@ wxWinPathConfigurator::wxWinPathConfigurator(wxWindow* parent,
   this->bUserCFGValid=(checkUserCFGPathValid(pcsx2Tool_m->GetUserCFGPath())<0)?false:true;
 }
 
+bool wxWinPathConfigurator::PathConfigIsValid(void)
+{
+  return(this->bPCSX2CFGValid && this->bUserCFGValid);
+}
+
 // event handlers
 
 bool wxWinPathConfigurator::Show(bool show)
 {
-  wxPuts("Show/hide Path cfg");
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(show)
   {
     this->bPathsChanged=false;
@@ -153,6 +158,7 @@ bool wxWinPathConfigurator::Show(bool show)
 void wxWinPathConfigurator::OnBrowsePCSX2Games(wxCommandEvent& WXUNUSED(event))
 {
   wxString strPath;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(!browseForFolder("Select PCSX2 Games Path (.iso containing folder)",strPath,this,this->txtPCSX2GamesPath->GetLabelText()))
     return;
   this->bPathsChanged=true;
@@ -162,7 +168,7 @@ void wxWinPathConfigurator::OnBrowsePCSX2Games(wxCommandEvent& WXUNUSED(event))
 void wxWinPathConfigurator::OnBrowsePCSX2EXE(wxCommandEvent& WXUNUSED(event))
 {
   wxString strPath;
-  wxPuts("Browse for PCSX2-Exe...");
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(!browseForFile(true,
                     "Select PCSX2-Executable",
                     strPath,
@@ -181,7 +187,7 @@ void wxWinPathConfigurator::OnBrowsePCSX2EXE(wxCommandEvent& WXUNUSED(event))
 void wxWinPathConfigurator::OnBrowsePCSX2CFG(wxCommandEvent& WXUNUSED(event))
 {
   wxString strPath;
-  wxPuts("Browse for PCSX2-CFG...");
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(!browseForFolder("Select PCSX2 Config (inis-folder)",strPath,this,this->txtPCSX2CFGPath->GetLabelText()))
     return;
   if(!checkPCSX2CFGPathValid(strPath))
@@ -214,6 +220,7 @@ void wxWinPathConfigurator::OnBrowsePUserCFG(wxCommandEvent& WXUNUSED(event))
 
 void wxWinPathConfigurator::OnClose(wxCloseEvent& WXUNUSED(event))
 {
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(this->bPathsChanged)
   {
     switch(wxMessageBox("Do you want to Save Changes?",

@@ -31,7 +31,9 @@ public:
 
   void OnPathSelect(wxCommandEvent& event);
   void OnShortcutCreate(wxCommandEvent& event);
-  void OnClose(wxCloseEvent& event);
+  void OnOptionChangeStartNoGUI(wxCommandEvent& event);
+  void OnOptionChangeStartFullscreen(wxCommandEvent& event);
+  void OnOptionChangeStartFullBoot(wxCommandEvent& event);
   void OnAbout(wxCommandEvent& event);
 
   void OnNewConfig(wxCommandEvent& event);
@@ -40,24 +42,31 @@ public:
   void OnConfigDelete(wxCommandEvent& event);
   void OnEditConfig(wxCommandEvent& event);
 
+  void OnClose(wxCloseEvent& event);
+
   wxWinPathConfigurator *wxPathCfg;
 private:
   wxDECLARE_EVENT_TABLE();
 protected:
-  wxFlexGridSizer* layCFGEdit;
-  wxStaticText* m_staticText7;
-  wxStaticText* m_staticText8;
-  wxListBox* listGameConfigs;
-  wxButton* btnNewConfig;
-  wxButton* btnConfigDelete;
-  wxTextCtrl* txtNewCFGName;
-  wxButton* btnNewConfigSave;
-  wxButton* btnNewConfigCancel;
-  wxButton* btnConfigStartPCSX2;
-  wxMenuBar* m_menubar2;
-  wxMenu* m_menu3;
-  wxMenuItem* menuItemCreateGameShortcut;
-  wxMenu* menuHelp;
+    wxFlexGridSizer* layCFGEdit;
+    wxStaticText* m_staticText7;
+    wxStaticText* m_staticText8;
+    wxListBox* listGameConfigs;
+    wxButton* btnNewConfig;
+    wxButton* btnConfigDelete;
+    wxTextCtrl* txtNewCFGName;
+    wxButton* btnNewConfigSave;
+    wxButton* btnNewConfigCancel;
+    wxButton* btnConfigStartPCSX2;
+    wxMenuBar* m_menubar2;
+    wxMenu* menuFile;
+    wxMenuItem* menuItemCreateGameShortcut;
+    wxMenu* menuOptions;
+    wxMenu* menuSubGameShortcuts;
+    wxMenuItem* menuItemEnableStartNoGUI;
+    wxMenuItem* menuItemEnableStartFullscreen;
+    wxMenuItem* menuItemEnableStartFullBoot;
+    wxMenu* menuHelp;
 };
 
 #endif //MAINWINDOW_H_INCLUDED

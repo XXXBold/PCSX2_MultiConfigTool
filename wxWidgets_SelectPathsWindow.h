@@ -16,6 +16,8 @@ class wxWinPathConfigurator : public wxFrame
                           const wxSize& size = wxSize( 640,330 ),
                           long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL);
 
+    bool PathConfigIsValid(void);
+
     bool Show(bool);
     void OnBrowsePCSX2Games(wxCommandEvent& event);
     void OnBrowsePCSX2EXE(wxCommandEvent& event);
@@ -23,10 +25,10 @@ class wxWinPathConfigurator : public wxFrame
     void OnBrowsePUserCFG(wxCommandEvent& event);
     void OnClose(wxCloseEvent &event);
 
-    bool bUserCFGValid;
-    bool bPCSX2CFGValid;
   private:
     bool bPathsChanged;
+    bool bUserCFGValid;
+    bool bPCSX2CFGValid;
     wxDECLARE_EVENT_TABLE();
   protected:
     wxStaticText* m_staticText6;
