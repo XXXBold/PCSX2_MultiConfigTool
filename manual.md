@@ -1,4 +1,6 @@
-This Document describes how to use the PCSX2 MultiConfigTool
+# User Manual for PCSX2_MultiConfigTool
+
+### This Document describes how to use the PCSX2 MultiConfigTool
 
 At the First Start, you need to set up some Paths to make it work correctly.
 - Games-Path: 
