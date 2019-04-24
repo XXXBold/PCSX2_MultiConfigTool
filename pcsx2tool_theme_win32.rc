@@ -1,0 +1,2 @@
+appicon ICON "pcsx2tool_logo.ico"
+#include "wx/msw/wx.rc"
