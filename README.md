@@ -18,6 +18,7 @@ Tell me if you need help or more information.
 - 0.1: First Release
 - 0.2-beta: Added Some new options
 - 0.3-beta: Added support for linux, updated to new codebase
+- 0.4-beta: Improved UI Controls, enhanced shortcut creation (Overwrite-confirm dialog), ask to set executable bit for linux version directly
 
 ## TODOs
 - Add build instructions
