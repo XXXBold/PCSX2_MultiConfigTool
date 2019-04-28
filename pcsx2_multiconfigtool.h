@@ -1,9 +1,5 @@
 #ifndef PCSX2_TOOL_H_INCLUDED
 #define PCSX2_TOOL_H_INCLUDED
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-  #include <wx/wx.h>
-#endif
 
 #include <string>
 #include "appconfig.h"
@@ -26,7 +22,7 @@
 
 #define APP_DISPLAY_NAME       "PCSX2_MultiConfigTool"
 #define APP_VERSION_MAJOR      0
-#define APP_VERSION_MINOR      3
+#define APP_VERSION_MINOR      4
 #define APP_VERSION_PATCH      0
 #define APP_VERSION_DEVSTATE   "Beta"
 #define APP_VERSION_BUILDTIME  "Build: " __DATE__ ", " __TIME__

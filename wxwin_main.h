@@ -14,6 +14,7 @@ class PCSX2Tool_GUI : public wxApp
 public:
   virtual bool OnInit(void);
 private:
+  PCSX2Tool *ptagPCSX2Tool;
 };
 
 class wxWinMain : public wxFrame
@@ -42,13 +43,14 @@ public:
   void OnNewConfigSave(wxCommandEvent& event);
   void OnNewConfigCancel(wxCommandEvent& event);
   void OnConfigDelete(wxCommandEvent& event);
-  void OnEditConfig(wxCommandEvent& event);
+  void OnEditConfigStartPCSX2(wxCommandEvent& event);
 
   void OnClose(wxCloseEvent& event);
 
   wxWinPathConfigurator *wxPathCfg;
 private:
   bool bRenameConfig;
+  int iCurrSelection;
 
   void ShowCfgNameEdit(const wxString &name,
                        bool configExists);
@@ -56,15 +58,14 @@ private:
   wxDECLARE_EVENT_TABLE();
 protected:
     wxFlexGridSizer* layCFGEdit;
-    wxStaticText* m_staticText7;
-    wxStaticText* m_staticText8;
     wxListBox* listGameConfigs;
-    wxButton* btnNewConfig;
-    wxButton* btnRenameConfig;
+    wxButton* btnConfigCreateNew;
+    wxButton* btnConfigRename;
     wxButton* btnConfigDelete;
     wxTextCtrl* txtNewCFGName;
-    wxButton* btnNewConfigSave;
-    wxButton* btnNewConfigCancel;
+    wxBoxSizer* laySaveCancelBtn;
+    wxButton* btnConfigSave;
+    wxButton* btnConfigCancel;
     wxButton* btnConfigStartPCSX2;
     wxMenuBar* m_menubar2;
     wxMenu* menuFile;

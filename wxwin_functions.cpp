@@ -10,13 +10,14 @@
 
 bool browseForFolder(const wxString &description,
                      wxString &outPath,
+                     bool browseReadOnly,
                      wxWindow *parent,
                      const wxString &defaultPath)
 {
   wxDirDialog pathSelector(parent,
                            description,
                            defaultPath,
-                           wxDD_DEFAULT_STYLE);
+                           ((browseReadOnly)?wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST:wxDD_DEFAULT_STYLE));
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(pathSelector.ShowModal() == wxID_CANCEL)
     return(false);     // the user changed idea...
@@ -116,9 +117,33 @@ bool checkPCSX2CFGPathValid(const wxString &path)
     return(false);
 
   fileIterator.ChangePathTo(strPath);
-  if(fileIterator.FindFirst("*.ini").IsEmpty())
+  strPath=fileIterator.FindFirst("*");
+  if(strPath.IsEmpty()) /* No file found */
     return(false);
-  return(true);
+  DEBUG_WXPUTS("First file found: " + strPath);
+  /* Found some file, now test if it's an .ini file */
+  return(strPath.EndsWith(".ini"));
+}
+
+bool checkUserCFGPathValid(const wxString &path)
+{
+  wxFileSystem fileIterator;
+  wxString strPath=path;
+  wxString strCurrFolder;
+  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
+  if(path.Last()!=wxFILE_SEP_PATH)
+    strPath.append(wxFILE_SEP_PATH);
+  if(!wxDir::Exists(strPath))
+    return(false);
+
+  fileIterator.ChangePathTo(strPath);
+  if(fileIterator.FindFirst("*").IsEmpty())
+    return(true);
+  DEBUG_WXPUTS("First file: " + fileIterator.FindFirst("*"));
+
+  if(fileIterator.FindFileInPath(&strCurrFolder,strPath,FILE_CONFIG_INDICATOR))
+    return(true);
+  return(false);
 }
 
 bool createUserConfigIndicator(const wxString &path)
@@ -143,27 +168,6 @@ bool createUserConfigIndicator(const wxString &path)
     return(newFile.Close());
   }
   return(false);
-}
-
-int checkUserCFGPathValid(const wxString &path)
-{
-  wxFileSystem fileIterator;
-  wxString strPath=path;
-  wxString strCurrFolder;
-  DEBUG_WXPUTS(__PRETTY_FUNCTION__);
-  if(path.Last()!=wxFILE_SEP_PATH)
-    strPath.append(wxFILE_SEP_PATH);
-  if(!wxDir::Exists(strPath))
-    return(-1);
-
-  fileIterator.ChangePathTo(strPath);
-  if(fileIterator.FindFirst("*").IsEmpty())
-    return(0);
-  DEBUG_WXPUTS("First file: " + fileIterator.FindFirst("*"));
-
-  if(fileIterator.FindFileInPath(&strCurrFolder,strPath,FILE_CONFIG_INDICATOR))
-    return(1);
-  return(-1);
 }
 
 bool getSubFoldersFromPath(const wxString &path,

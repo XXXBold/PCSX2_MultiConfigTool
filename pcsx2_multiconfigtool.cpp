@@ -1,6 +1,5 @@
-#include <iostream>
 #include <string>
-#include <cstdio>
+#include <string.h>
 
 #include "pcsx2_multiconfigtool.h"
 
@@ -8,9 +7,6 @@
 #define PCSX2_CMD_NOGUI       "--nogui"
 #define PCSX2_CMD_FULLSCREEN  "--fullscreen"
 #define PCSX2_CMD_FULLBOOT    "--fullboot"
-
-#define DEBUG_TRACE_PRINTF(txt,...) printf(txt,__VA_ARGS__)
-#define DEBUG_TRACE_TXT(txt)        fputs(txt,stdout)
 
 PCSX2Tool *pcsx2Tool_m;
 
@@ -122,7 +118,6 @@ bool PCSX2Tool::GetOptionStartFullBoot(void)
 
 bool PCSX2Tool::SetPCSX2GamesPath(const string &path)
 {
-  DEBUG_TRACE_PRINTF("Set PCSX2-Games-Path: %s\n",path.data());
   if(path.length() < MAX_PATHLEN-1)
   {
     memcpy(this->caBufPathGames,path.c_str(),path.length()+1);
@@ -133,7 +128,6 @@ bool PCSX2Tool::SetPCSX2GamesPath(const string &path)
 
 bool PCSX2Tool::SetPCSX2ExePath(const string &path)
 {
-  DEBUG_TRACE_PRINTF("Set PCSX2-EXE-Path: %s\n",path.data());
   if(path.length() < MAX_PATHLEN-1)
   {
     memcpy(this->caBufPathExe,path.c_str(),path.length()+1);
@@ -144,7 +138,6 @@ bool PCSX2Tool::SetPCSX2ExePath(const string &path)
 
 bool PCSX2Tool::SetPCSX2CFGPath(const string &path)
 {
-  DEBUG_TRACE_PRINTF("Set PCSX2-CFG-Path: %s\n",path.data());
   if(path.length() < MAX_PATHLEN-1)
   {
     memcpy(this->caBufPathPCSX2Cfg,path.c_str(),path.length()+1);
@@ -155,7 +148,6 @@ bool PCSX2Tool::SetPCSX2CFGPath(const string &path)
 
 bool PCSX2Tool::SetUserCFGPath(const string &path)
 {
-  DEBUG_TRACE_PRINTF("Set User-CFG-Path: %s\n",path.data());
   if(path.length() < MAX_PATHLEN-1)
   {
     memcpy(this->caBufPathUserCfg,path.c_str(),path.length()+1);
@@ -179,11 +171,16 @@ void PCSX2Tool::SetOptionStartFullBoot(bool fullboot)
   DATA_SET_BOOL(this->taEntries[ENTRY_INDEX_OPT_START_FULLBOOT].tagData,(fullboot)?1:0);
 }
 
-void PCSX2Tool::CreateCommandLine_PCSX2StartWithCFG(const string&configName,
-                                                    const string&gamePath,
-                                                    string&cmdLine)
+void PCSX2Tool::CreateCommandLine_PCSX2StartWithCFG(const string &configName,
+                                                    const string &gamePath,
+                                                    string &cmdLine)
 {
-  cmdLine="\"";
+#ifdef _WIN32
+  cmdLine="";
+#elif __linux__
+  cmdLine="#!/bin/sh\n";
+#endif /* _WIN32 */
+  cmdLine.append("\"");
   cmdLine.append(this->caBufPathExe);
   cmdLine.append("\" \"");
   cmdLine.append(gamePath);
@@ -212,10 +209,13 @@ void PCSX2Tool::CreateCommandLine_PCSX2StartWithCFG(const string&configName,
     cmdLine.append(" ");
     cmdLine.append(PCSX2_CMD_FULLBOOT);
   }
+#ifdef _WIN32
+#elif __linux__
+#endif /* _WIN32 */
 }
 
-void PCSX2Tool::CreateCommandLine_PCSX2StartWithCFG(const string&configName,
-                                                    string&cmdLine)
+void PCSX2Tool::CreateCommandLine_PCSX2StartWithCFG(const string &configName,
+                                                    string &cmdLine)
 {
   cmdLine="\"";
   cmdLine.append(this->caBufPathExe);

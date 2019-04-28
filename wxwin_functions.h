@@ -23,6 +23,7 @@
 
 bool browseForFolder(const wxString &description,
                      wxString &outPath,
+                     bool browseReadOnly,
                      wxWindow *parent,
                      const wxString &defaultPath);
 
@@ -43,7 +44,7 @@ bool renameFolder(const wxString &before,
 
 bool checkPCSX2CFGPathValid(const wxString &path);
 
-int checkUserCFGPathValid(const wxString &path);
+bool checkUserCFGPathValid(const wxString &path);
 
 bool createUserConfigIndicator(const wxString &path);
 

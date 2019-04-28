@@ -129,25 +129,23 @@ wxWinPathConfigurator::wxWinPathConfigurator(wxWindow* parent,
   this->Layout();
 
   this->Centre( wxBOTH );
-
-  this->bPCSX2CFGValid=checkPCSX2CFGPathValid(pcsx2Tool_m->GetPCSX2CFGPath());
-  this->bUserCFGValid=(checkUserCFGPathValid(pcsx2Tool_m->GetUserCFGPath())<0)?false:true;
 }
 
 bool wxWinPathConfigurator::PathConfigIsValid(void)
 {
-  return(this->bPCSX2CFGValid && this->bUserCFGValid);
+  return(checkPCSX2CFGPathValid(pcsx2Tool_m->GetPCSX2CFGPath()) &&
+         checkUserCFGPathValid(pcsx2Tool_m->GetUserCFGPath()));
 }
 
 // event handlers
 
-bool wxWinPathConfigurator::Show(bool show)
+bool wxWinPathConfigurator::Show(bool show,
+                                 bool bFirstRun)
 {
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(show)
   {
-    DEBUG_WXPUTS("PATH: " + pcsx2Tool_m->GetPCSX2GamesPath());
-    this->bPathsChanged=false;
+    this->bPathsChanged=bFirstRun;
     this->txtPCSX2GamesPath->SetValue(pcsx2Tool_m->GetPCSX2GamesPath());
     this->txtPCSX2ExePath->SetValue(pcsx2Tool_m->GetPCSX2ExePath());
     this->txtPCSX2CFGPath->SetValue(pcsx2Tool_m->GetPCSX2CFGPath());
@@ -160,7 +158,7 @@ void wxWinPathConfigurator::OnBrowsePCSX2Games(wxCommandEvent& WXUNUSED(event))
 {
   wxString strPath;
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
-  if(!browseForFolder("Select PCSX2 Games Path (.iso containing folder)",strPath,this,this->txtPCSX2GamesPath->GetValue()))
+  if(!browseForFolder("Select PCSX2 Games Path (.iso containing folder)",strPath,true,this,this->txtPCSX2GamesPath->GetValue()))
     return;
   this->bPathsChanged=true;
   strPath.append((wxFILE_SEP_PATH));
@@ -190,7 +188,7 @@ void wxWinPathConfigurator::OnBrowsePCSX2CFG(wxCommandEvent& WXUNUSED(event))
 {
   wxString strPath;
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
-  if(!browseForFolder("Select PCSX2 Config (inis-folder)",strPath,this,this->txtPCSX2CFGPath->GetValue()))
+  if(!browseForFolder("Select PCSX2 Config (inis-folder)",strPath,true,this,this->txtPCSX2CFGPath->GetValue()))
     return;
   if(!checkPCSX2CFGPathValid(strPath))
   {
@@ -208,9 +206,9 @@ void wxWinPathConfigurator::OnBrowsePUserCFG(wxCommandEvent& WXUNUSED(event))
 {
   wxString strPath;
   DEBUG_WXPUTS("Browse for User-CFG...");
-  if(!browseForFolder("Choose your location to store the diffrent PCSX2-Configurations per Game",strPath,this,this->txtUserCFGPath->GetValue()))
+  if(!browseForFolder("Choose your location to store the diffrent PCSX2-Configurations per Game",strPath,false,this,this->txtUserCFGPath->GetValue()))
     return;
-  if(checkUserCFGPathValid(strPath)<0)
+  if(!checkUserCFGPathValid(strPath))
   {
     wxMessageBox("Selected path not valid, it should be empty, or a previous created by this tool. Select another folder.",
                  "Path not valid",
@@ -234,20 +232,20 @@ void wxWinPathConfigurator::OnClose(wxCloseEvent& WXUNUSED(event))
     {
       case wxCANCEL:
         return;
+      case wxNO:
+        break;
       case wxYES:
-        if(!(this->bPCSX2CFGValid=checkPCSX2CFGPathValid(this->txtPCSX2CFGPath->GetValue())))
+        if(!checkPCSX2CFGPathValid(this->txtPCSX2CFGPath->GetValue()))
         {
           if(wxMessageBox("Warning: PCSX2-Config Path is not valid. Do you really want to exit Configuration?",
                           wxMessageBoxCaptionStr,
                           wxYES_NO|wxCENTER|wxICON_EXCLAMATION,
-                          this)==wxNO)
+                          this) == wxNO)
             return;
-          break;
         }
-        switch(checkUserCFGPathValid(this->txtUserCFGPath->GetValue()))
+        if(checkUserCFGPathValid(this->txtUserCFGPath->GetValue()))
         {
-          case 0: /* Valid, but empty */
-            DEBUG_WXPUTS("Empty folder, creating file indicator...");
+            DEBUG_WXPUTS("Config Path okay, trying to create file indicator...");
             if(!createUserConfigIndicator(this->txtUserCFGPath->GetValue()))
             {
               wxMessageBox("Cannot create new User config file @" + this->txtUserCFGPath->GetValue() + ", try another path",
@@ -256,19 +254,14 @@ void wxWinPathConfigurator::OnClose(wxCloseEvent& WXUNUSED(event))
                            this);
               return;
             }
-            /* Fallthrough */
-          case 1: /* Already checked & some data there */
-            DEBUG_WXPUTS("Already cfgs there");
-            this->bUserCFGValid=true;
-            break;
-          default:
-            if(wxMessageBox("Warning: User Config Path is not valid. Do you really want to exit Configuration?",
-                            wxMessageBoxCaptionStr,
-                            wxYES_NO|wxCENTER|wxICON_EXCLAMATION,
-                            this)==wxNO)
-              return;
-            this->bUserCFGValid=false;
-            break;
+            /* Okay, already existed or successfully created file indicator */
+        }
+        else if(wxMessageBox("Warning: User Config Path is not valid. Do you really want to exit Configuration?",
+                wxMessageBoxCaptionStr,
+                wxYES_NO|wxCENTER|wxICON_EXCLAMATION,
+                this) == wxNO)
+        {
+          return;
         }
         if((pcsx2Tool_m->SetPCSX2GamesPath(this->txtPCSX2GamesPath->GetValue().ToStdString())) &&
            (pcsx2Tool_m->SetPCSX2ExePath(this->txtPCSX2ExePath->GetValue().ToStdString())) &&
@@ -282,9 +275,8 @@ void wxWinPathConfigurator::OnClose(wxCloseEvent& WXUNUSED(event))
                      wxOK|wxCENTER|wxICON_EXCLAMATION,
                      this);
         break;
-      case wxNO:
-        break;
-      default:
+      default: /* Should not happen */
+        DEBUG_WXPUTS("****Unhandled case in switch (should not happen!)");
         return;
     }
   }

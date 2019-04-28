@@ -1,7 +1,6 @@
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
   #include <wx/wx.h>
-  #include <wx/stdpaths.h>
   #include <wx/filename.h>
   #include <wx/aboutdlg.h>
 #endif
@@ -12,18 +11,15 @@
 enum
 {
   // menu items
-  MainWindow_EditCFGs                     = wxID_EDIT,
-  MainWindow_About                        = wxID_ABOUT,
-  MainWindow_OptionsStartNoGUI            =1,
-  MainWindow_OptionsStartEnableFullscreen ,
-  MainWindow_OptionsStartEnableFullBoot   ,
-  MainWindow_CreateGameShortcut           ,
-  MainWindow_OpenPathConfig               ,
-};
+  MainWindow_OptionsStartNoGUI = 1,
+  MainWindow_OptionsStartEnableFullscreen,
+  MainWindow_OptionsStartEnableFullBoot,
+  MainWindow_CreateGameShortcut,
+  MainWindow_OpenPathConfig,
+  MainWindow_About = wxID_ABOUT,
 
-enum /* Buttons */
-{
-  BTN_NewConfig,
+  // Buttons
+  BTN_NewConfig=1,
   BTN_RenameConfig,
   BTN_NewConfigSave,
   BTN_NewConfigCancel,
@@ -33,27 +29,27 @@ enum /* Buttons */
 };
 
 wxBEGIN_EVENT_TABLE(wxWinMain,wxFrame)
-EVT_MENU(MainWindow_About,                        wxWinMain::OnAbout)
-EVT_MENU(MainWindow_OpenPathConfig,               wxWinMain::OnPathSelect)
-EVT_MENU(MainWindow_CreateGameShortcut,           wxWinMain::OnShortcutCreate)
+EVT_MENU(MainWindow_About,wxWinMain::OnAbout)
+EVT_MENU(MainWindow_OpenPathConfig,wxWinMain::OnPathSelect)
+EVT_MENU(MainWindow_CreateGameShortcut,wxWinMain::OnShortcutCreate)
 
-EVT_MENU(MainWindow_OptionsStartNoGUI,            wxWinMain::OnOptionChangeStartNoGUI)
-EVT_MENU(MainWindow_OptionsStartEnableFullscreen, wxWinMain::OnOptionChangeStartFullscreen)
-EVT_MENU(MainWindow_OptionsStartEnableFullBoot,   wxWinMain::OnOptionChangeStartFullBoot)
+EVT_MENU(MainWindow_OptionsStartNoGUI,wxWinMain::OnOptionChangeStartNoGUI)
+EVT_MENU(MainWindow_OptionsStartEnableFullscreen,wxWinMain::OnOptionChangeStartFullscreen)
+EVT_MENU(MainWindow_OptionsStartEnableFullBoot,wxWinMain::OnOptionChangeStartFullBoot)
 
-EVT_BUTTON(BTN_NewConfig,                         wxWinMain::OnNewConfig)
-EVT_BUTTON(BTN_RenameConfig,                      wxWinMain::OnRenameConfig)
-EVT_BUTTON(BTN_NewConfigSave,                     wxWinMain::OnNewConfigSave)
-EVT_BUTTON(BTN_NewConfigCancel,                   wxWinMain::OnNewConfigCancel)
-EVT_BUTTON(BTN_ConfigDelete,                      wxWinMain::OnConfigDelete)
-EVT_BUTTON(BTN_ConfigStartPCSX2,                  wxWinMain::OnEditConfig)
+EVT_BUTTON(BTN_NewConfig,wxWinMain::OnNewConfig)
+EVT_BUTTON(BTN_RenameConfig,wxWinMain::OnRenameConfig)
+EVT_BUTTON(BTN_NewConfigSave,wxWinMain::OnNewConfigSave)
+EVT_BUTTON(BTN_NewConfigCancel,wxWinMain::OnNewConfigCancel)
+EVT_BUTTON(BTN_ConfigDelete,wxWinMain::OnConfigDelete)
+EVT_BUTTON(BTN_ConfigStartPCSX2,wxWinMain::OnEditConfigStartPCSX2)
 
 EVT_CLOSE(wxWinMain::OnClose)
 wxEND_EVENT_TABLE()
 
 IMPLEMENT_APP(PCSX2Tool_GUI)
 
-bool PCSX2Tool_GUI::OnInit()
+bool PCSX2Tool_GUI::OnInit(void)
 {
   bool bFirstStart=false;
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
@@ -65,9 +61,9 @@ bool PCSX2Tool_GUI::OnInit()
   switch(pcsx2Tool_m->LoadToolConfig())
   {
     case PCSX2_TOOL_CFG_ERROR:
-      wxMessageBox("Failed to load config from file. Delete config.ini and restart.",
+      wxMessageBox("Failed to load config from file, try to delete config.ini and restart.",
                    wxMessageBoxCaptionStr,
-                   wxOK|wxICON_WARNING|wxCENTER);
+                   wxOK | wxICON_ERROR | wxCENTER);
       return(false);
     case PCSX2_TOOL_CFG_NEW:
       bFirstStart=true;
@@ -80,24 +76,24 @@ bool PCSX2Tool_GUI::OnInit()
   if(bFirstStart)
   {
     if(wxMessageBox("This seems to be the First Launch of the " APP_DISPLAY_NAME ", do you want to Setup Paths now?",
-                 wxMessageBoxCaptionStr,
-                 wxYES_NO,
-                 winMain)==wxYES)
+                    wxMessageBoxCaptionStr,
+                    wxYES_NO,
+                    winMain) == wxYES)
     {
       //Show Path config
-      winMain->wxPathCfg->Show(true);
+      winMain->wxPathCfg->Show(true,true);
     }
   }
   return(true);
 }
 
-wxWinMain::wxWinMain(wxWindow* parent,
+wxWinMain::wxWinMain(wxWindow *parent,
                      wxWindowID id,
-                     const wxString& title,
-                     const wxPoint& pos,
-                     const wxSize& size,
-                     long style )
-          : wxFrame( parent, id, title, pos, size, style )
+                     const wxString &title,
+                     const wxPoint &pos,
+                     const wxSize &size,
+                     long style)
+          :wxFrame(parent,id,title,pos,size,style)
 {
   this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
@@ -107,6 +103,7 @@ wxWinMain::wxWinMain(wxWindow* parent,
   layCFGEdit->SetFlexibleDirection( wxBOTH );
   layCFGEdit->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
+  wxStaticText* m_staticText7;
   m_staticText7 = new wxStaticText( this, wxID_ANY, wxT("Manage your Configs here"), wxDefaultPosition, wxDefaultSize, 0 );
   m_staticText7->Wrap( -1 );
   layCFGEdit->Add( m_staticText7, 0, wxALL, 5 );
@@ -114,6 +111,7 @@ wxWinMain::wxWinMain(wxWindow* parent,
 
   layCFGEdit->Add( 0, 0, 1, wxEXPAND, 5 );
 
+  wxStaticText* m_staticText8;
   m_staticText8 = new wxStaticText( this, wxID_ANY, wxT("The <Default> Entry is your default PCSX2 Config"), wxDefaultPosition, wxDefaultSize, 0 );
   m_staticText8->Wrap( -1 );
   layCFGEdit->Add( m_staticText8, 0, wxALL, 5 );
@@ -124,35 +122,34 @@ wxWinMain::wxWinMain(wxWindow* parent,
   listGameConfigs = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxSize( -1,100 ), 0, NULL, 0 );
   layCFGEdit->Add( listGameConfigs, 0, wxALL|wxEXPAND, 5 );
 
-  wxBoxSizer* bSizer5;
-  bSizer5 = new wxBoxSizer( wxVERTICAL );
+  wxBoxSizer* layConfigEditBtns;
+  layConfigEditBtns = new wxBoxSizer( wxVERTICAL );
 
-  btnNewConfig = new wxButton( this, BTN_NewConfig, wxT("Create new Config..."), wxDefaultPosition, wxDefaultSize, 0 );
-  bSizer5->Add( btnNewConfig, 0, wxALL, 5 );
+  btnConfigCreateNew = new wxButton( this, BTN_NewConfig, wxT("Create new Config..."), wxDefaultPosition, wxDefaultSize, 0 );
+  layConfigEditBtns->Add( btnConfigCreateNew, 0, wxALL, 5 );
 
-  btnRenameConfig = new wxButton( this, BTN_RenameConfig, wxT("Rename Config..."), wxDefaultPosition, wxDefaultSize, 0 );
-  bSizer5->Add( btnRenameConfig, 0, wxALL, 5 );
+  btnConfigRename = new wxButton( this, BTN_RenameConfig, wxT("Rename Config..."), wxDefaultPosition, wxDefaultSize, 0 );
+  layConfigEditBtns->Add( btnConfigRename, 0, wxALL, 5 );
 
   btnConfigDelete = new wxButton( this, BTN_ConfigDelete, wxT("Delete Config"), wxDefaultPosition, wxDefaultSize, 0 );
-  bSizer5->Add( btnConfigDelete, 0, wxALL, 5 );
+  layConfigEditBtns->Add( btnConfigDelete, 0, wxALL, 5 );
 
 
-  layCFGEdit->Add( bSizer5, 1, wxEXPAND, 5 );
+  layCFGEdit->Add( layConfigEditBtns, 1, wxEXPAND, 5 );
 
   txtNewCFGName = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), 0 );
   layCFGEdit->Add( txtNewCFGName, 0, wxEXPAND|wxLEFT|wxRIGHT, 5 );
 
-  wxBoxSizer* bSizer4;
-  bSizer4 = new wxBoxSizer( wxHORIZONTAL );
+  laySaveCancelBtn = new wxBoxSizer( wxHORIZONTAL );
 
-  btnNewConfigSave = new wxButton( this, BTN_NewConfigSave, wxT("Save"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-  bSizer4->Add( btnNewConfigSave, 0, wxALIGN_CENTER_VERTICAL, 5 );
+  btnConfigSave = new wxButton( this, BTN_NewConfigSave, wxT("Save"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+  laySaveCancelBtn->Add( btnConfigSave, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
-  btnNewConfigCancel = new wxButton( this, BTN_NewConfigCancel, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-  bSizer4->Add( btnNewConfigCancel, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+  btnConfigCancel = new wxButton( this, BTN_NewConfigCancel, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+  laySaveCancelBtn->Add( btnConfigCancel, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 
 
-  layCFGEdit->Add( bSizer4, 1, wxEXPAND, 0 );
+  layCFGEdit->Add( laySaveCancelBtn, 1, wxEXPAND, 0 );
 
   btnConfigStartPCSX2 = new wxButton( this, BTN_ConfigStartPCSX2, wxT("Start PCSX2 to Edit your Settings for the selected Config"), wxDefaultPosition, wxDefaultSize, 0 );
   layCFGEdit->Add( btnConfigStartPCSX2, 0, wxALL, 5 );
@@ -203,22 +200,23 @@ wxWinMain::wxWinMain(wxWindow* parent,
   this->Centre( wxBOTH );
 }
 
-void wxWinMain::UpdateConfigList()
+void wxWinMain::UpdateConfigList(void)
 {
   wxArrayString astrFolders;
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   astrFolders.Add(DEFAULT_CONFIG_STRING);
+
   if(!getSubFoldersFromPath(pcsx2Tool_m->GetUserCFGPath(),&astrFolders))
   {
     DEBUG_WXPUTS("No folders found in usercfg, adding default only");
   }
-  for(unsigned int uiIndex=0;uiIndex<astrFolders.GetCount();++uiIndex)
+  for(unsigned int uiIndex=0;uiIndex < astrFolders.GetCount();++uiIndex)
   {
-    DEBUG_WXPUTS("Folder: " + astrFolders[uiIndex]);
+    DEBUG_WXPUTS("Add Folder(config) to list: "+astrFolders[uiIndex]);
   }
   this->listGameConfigs->Clear();
   this->listGameConfigs->InsertItems(astrFolders,0);
-  this->listGameConfigs->SetSelection(0);
+  this->listGameConfigs->SetSelection(0); // Select default entry
 }
 
 bool wxWinMain::Show(bool show)
@@ -241,21 +239,21 @@ bool wxWinMain::Show(bool show)
       this->menuItemCreateGameShortcut->Enable(true);
       this->layCFGEdit->Show(true);
       this->txtNewCFGName->Show(false);
-      this->btnNewConfigSave->Show(false);
-      this->btnNewConfigCancel->Show(false);
+      this->laySaveCancelBtn->Show(false);
       this->UpdateConfigList();
+      this->layCFGEdit->Layout(); // Recalculate layout
     }
   }
   return(wxFrame::Show(show));
 }
 
-void wxWinMain::OnPathSelect(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnPathSelect(wxCommandEvent &WXUNUSED(event))
 {
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   this->wxPathCfg->Show(true);
 }
 
-void wxWinMain::OnShortcutCreate(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnShortcutCreate(wxCommandEvent &WXUNUSED(event))
 {
   wxString strPath;
   wxString strConfigName;
@@ -263,9 +261,18 @@ void wxWinMain::OnShortcutCreate(wxCommandEvent& WXUNUSED(event))
   wxFile newFile;
   int iIndex;
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
-  if((iIndex=this->listGameConfigs->GetSelection())==wxNOT_FOUND)
+  if((iIndex=this->listGameConfigs->GetSelection()) == wxNOT_FOUND)
     return;
-  if(!browseForFile(true,"Select .iso file of the game",strPath,".iso-Files (*.iso)|*.iso",this,pcsx2Tool_m->GetPCSX2GamesPath()))
+  if(!browseForFile(true,
+                    "Select .iso file of the game",
+                    strPath,
+#ifdef _WIN32
+                    ".iso-Files (*.iso)|*.iso|All files (*.*)|*.*",
+#elif __linux__
+                    ".iso-Files (*.iso)|*.iso|All files (*.*)|*",
+#endif /* _WIN32 */
+                    this,
+                    pcsx2Tool_m->GetPCSX2GamesPath()))
   {
     return;
   }
@@ -274,9 +281,9 @@ void wxWinMain::OnShortcutCreate(wxCommandEvent& WXUNUSED(event))
   else
     strConfigName="";
   pcsx2Tool_m->CreateCommandLine_PCSX2StartWithCFG(strConfigName.ToStdString(),strPath.ToStdString(),strCMDLine);
-  DEBUG_WXPUTS("Got cmdline: " + strCMDLine);
+  DEBUG_WXPUTS("Got cmdline: "+strCMDLine);
   if(!browseForFile(false,
-                    "Save Shortcut for " + strPath,
+                    "Save Shortcut for "+strPath,
                     strPath,
 #ifdef _WIN32
                     ".bat Files (*.bat)|*.bat",
@@ -288,11 +295,32 @@ void wxWinMain::OnShortcutCreate(wxCommandEvent& WXUNUSED(event))
   {
     return;
   }
-  if(!newFile.Create(strPath))
+  if(wxFile::Exists(strPath))
   {
-    wxMessageBox("Failed to Create file " + strPath,
+    if(wxMessageBox("File \""+strPath+"\" already exists. Overwrite it?",
+                    "File already exists",
+                    wxYES_NO | wxCENTER | wxICON_QUESTION,
+                    this) != wxYES)
+    {
+      return;
+    }
+  }
+  iIndex=wxS_DEFAULT;
+#ifdef __linux__
+  /* On Linux, ask to set executable bit for new shortcut */
+  if(wxMessageBox("Enable Execute bit for this user on Shortcut?",
+                  "Set Executable bit",
+                  wxYES_NO | wxCENTER | wxICON_QUESTION,
+                  this) == wxYES)
+  {
+    iIndex|=wxPOSIX_USER_EXECUTE;
+  }
+#endif /* __linux__ */
+  if(!newFile.Create(strPath,true,iIndex))
+  {
+    wxMessageBox("Failed to Create file "+strPath,
                  wxMessageBoxCaptionStr,
-                 wxOK|wxCENTER|wxICON_EXCLAMATION,
+                 wxOK | wxCENTER | wxICON_EXCLAMATION,
                  this);
     return;
   }
@@ -300,25 +328,25 @@ void wxWinMain::OnShortcutCreate(wxCommandEvent& WXUNUSED(event))
   newFile.Close();
 }
 
-void wxWinMain::OnOptionChangeStartNoGUI(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnOptionChangeStartNoGUI(wxCommandEvent &WXUNUSED(event))
 {
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   pcsx2Tool_m->SetOptionStartNoGUI(this->menuItemEnableStartNoGUI->IsChecked());
 }
 
-void wxWinMain::OnOptionChangeStartFullscreen(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnOptionChangeStartFullscreen(wxCommandEvent &WXUNUSED(event))
 {
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   pcsx2Tool_m->SetOptionStartFullScreen(this->menuItemEnableStartFullscreen->IsChecked());
 }
 
-void wxWinMain::OnOptionChangeStartFullBoot(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnOptionChangeStartFullBoot(wxCommandEvent &WXUNUSED(event))
 {
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   pcsx2Tool_m->SetOptionStartFullBoot(this->menuItemEnableStartFullBoot->IsChecked());
 }
 
-void wxWinMain::OnAbout(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnAbout(wxCommandEvent &WXUNUSED(event))
 {
   wxAboutDialogInfo wAbout;
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
@@ -333,7 +361,10 @@ void wxWinMain::OnAbout(wxCommandEvent& WXUNUSED(event))
                                      APP_VERSION_BUILDTIME));
   wAbout.SetDescription("Welcome to the " APP_DISPLAY_NAME "!\n"
                         "This is a Tool to manage multiple Configs for PCSX2\n"
-                        "Credits to wxWidgets GUI-Library, for making this possible.\n");
+                        "For proper functionality, make sure all Paths are set correctly.\n"
+                        "If you need help, or found a bug, visit the website of the Project.\n"
+                        "\n"
+                        "Credits to the wxWidgets GUI-Library, for making this possible.\n");
   wAbout.SetCopyright("(C) 2018-2019 by XXXBold");
 
   wAbout.SetWebSite(APP_PROJECT_HOMEPAGE);
@@ -342,76 +373,85 @@ void wxWinMain::OnAbout(wxCommandEvent& WXUNUSED(event))
   wxAboutBox(wAbout,this);
 }
 
-void wxWinMain::OnNewConfig(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnNewConfig(wxCommandEvent &WXUNUSED(event))
 {
-  int iIndex;
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
-  if((iIndex=this->listGameConfigs->GetSelection()) == wxNOT_FOUND)
+  if((this->iCurrSelection=this->listGameConfigs->GetSelection()) == wxNOT_FOUND)
     return;
 
-  if(wxMessageBox("Do you want to create a new Config based on \"" + this->listGameConfigs->GetString(iIndex) + "\"?",
+  if(wxMessageBox("Do you want to create a new Config based on \""+this->listGameConfigs->GetString(this->iCurrSelection)+"\"?",
                   wxMessageBoxCaptionStr,
                   wxYES_NO,
-                  this)!=wxYES)
+                  this) != wxYES)
   {
     return;
   }
   this->ShowCfgNameEdit("NewConfigName",false);
 }
 
-void wxWinMain::OnRenameConfig(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnRenameConfig(wxCommandEvent &WXUNUSED(event))
 {
-  int iIndex;
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
-  if(((iIndex=this->listGameConfigs->GetSelection()) == wxNOT_FOUND) || (iIndex==0))
+  if(((this->iCurrSelection=this->listGameConfigs->GetSelection()) == wxNOT_FOUND) || (this->iCurrSelection == 0))
     return;
 
-  this->ShowCfgNameEdit(this->listGameConfigs->GetString(iIndex),true);
+  this->ShowCfgNameEdit(this->listGameConfigs->GetString(this->iCurrSelection),true);
 }
 
 void wxWinMain::ShowCfgNameEdit(const wxString &name,
                                 bool configExists)
 {
-
   this->bRenameConfig=configExists;
+  /* Enable elements for editing */
   this->txtNewCFGName->Show(true);
-  this->btnNewConfigSave->Show(true);
-  this->btnNewConfigCancel->Show(true);
+  this->laySaveCancelBtn->Show(true);
+  /* Disable other elements */
+  this->btnConfigStartPCSX2->Show(false);
+  this->listGameConfigs->Deselect(this->iCurrSelection); /* Mint theme visible bug fix */
+  this->listGameConfigs->Enable(false);
+  this->btnConfigCreateNew->Enable(false);
+  this->btnConfigRename->Enable(false);
+  this->btnConfigDelete->Enable(false);
+
   this->txtNewCFGName->SetValue(name);
   this->txtNewCFGName->SetFocus();
   this->txtNewCFGName->SetSelection(0,this->txtNewCFGName->GetLineLength(0));
 }
 
-void wxWinMain::HideCfgNameEdit()
+void wxWinMain::HideCfgNameEdit(void)
 {
+  this->layCFGEdit->Show(true);
   this->txtNewCFGName->Show(false);
-  this->btnNewConfigSave->Show(false);
-  this->btnNewConfigCancel->Show(false);
+  this->laySaveCancelBtn->Show(false);
+  this->btnConfigStartPCSX2->Show(true);
+
+  this->btnConfigCreateNew->Enable(true);
+  this->btnConfigRename->Enable(true);
+  this->btnConfigDelete->Enable(true);
+  this->listGameConfigs->Enable(true);
+  this->listGameConfigs->Select(this->iCurrSelection); /* Mint theme visible bug fix */
 }
 
-void wxWinMain::OnNewConfigSave(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnNewConfigSave(wxCommandEvent &WXUNUSED(event))
 {
-  int iIndex;
   wxString strSrcPath;
   wxString strDestPath;
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
-  if((iIndex=this->listGameConfigs->GetSelection())==wxNOT_FOUND)
-    return;
 
-  if(!iIndex) /* Default, means use PCSX2 CFG path*/
+  if(!this->iCurrSelection) /* Default, means use PCSX2 CFG path*/
     strSrcPath=pcsx2Tool_m->GetPCSX2CFGPath();
   else
-    strSrcPath=pcsx2Tool_m->GetUserCFGPath() + this->listGameConfigs->GetString(iIndex);
+    strSrcPath=pcsx2Tool_m->GetUserCFGPath()+this->listGameConfigs->GetString(this->iCurrSelection);
 
-  this->btnNewConfigSave->SetFocus(); /* to let wxWidgets take our typed in name into ->txtNewCFGName */
+  this->btnConfigSave->SetFocus(); /* to let wxWidgets take our typed in name into ->txtNewCFGName */
 
-  strDestPath=pcsx2Tool_m->GetUserCFGPath() + this->txtNewCFGName->GetLineText(0);
+  strDestPath=pcsx2Tool_m->GetUserCFGPath()+this->txtNewCFGName->GetLineText(0);
   if(this->bRenameConfig)
   {
-    DEBUG_WXPUTS("Rename " + strSrcPath + " to " + strDestPath);
+    DEBUG_WXPUTS("Rename "+strSrcPath+" to "+strDestPath);
     if(!renameFolder(strSrcPath,strDestPath))
     {
-      wxMessageBox("Rename " + strSrcPath + " to " + strDestPath + " failed.\n"
+      wxMessageBox("Rename "+strSrcPath+" to "+strDestPath+" failed.\n"
                    "Make sure the File doesn't exist already, or check permissions",
                    wxMessageBoxCaptionStr,
                    wxOK | wxCENTER | wxICON_EXCLAMATION,this);
@@ -422,10 +462,10 @@ void wxWinMain::OnNewConfigSave(wxCommandEvent& WXUNUSED(event))
     this->UpdateConfigList();
     return;
   }
-  DEBUG_WXPUTS("Copy " + strSrcPath + " to " + strDestPath);
+  DEBUG_WXPUTS("Copy "+strSrcPath+" to "+strDestPath);
   if(!copyFolderContents(strSrcPath,strDestPath))
   {
-    wxMessageBox("Copy from " + strSrcPath + " to " + strDestPath + " failed.\n"
+    wxMessageBox("Copy from "+strSrcPath+" to "+strDestPath+" failed.\n"
                  "Make sure the File doesn't exist already, or check permissions",
                  wxMessageBoxCaptionStr,
                  wxOK | wxCENTER | wxICON_EXCLAMATION,this);
@@ -435,72 +475,68 @@ void wxWinMain::OnNewConfigSave(wxCommandEvent& WXUNUSED(event))
   this->UpdateConfigList();
 }
 
-void wxWinMain::OnNewConfigCancel(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnNewConfigCancel(wxCommandEvent &WXUNUSED(event))
 {
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   this->HideCfgNameEdit();
 }
 
-void wxWinMain::OnConfigDelete(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnConfigDelete(wxCommandEvent &WXUNUSED(event))
 {
   int iIndex;
   wxString strPath;
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
-  if(((iIndex=this->listGameConfigs->GetSelection())==wxNOT_FOUND) || (iIndex==0)) /* Don't allow default to be deleted */
+  if(((iIndex=this->listGameConfigs->GetSelection()) == wxNOT_FOUND) || (iIndex == 0)) /* Don't allow default to be deleted */
     return;
 
-  strPath=pcsx2Tool_m->GetUserCFGPath() + this->listGameConfigs->GetString(iIndex);
-  if(wxMessageBox("Do you really want to delete Config \"" + this->listGameConfigs->GetString(iIndex) + "\"?",
+  strPath=pcsx2Tool_m->GetUserCFGPath()+this->listGameConfigs->GetString(iIndex);
+  if(wxMessageBox("Do you really want to delete Config \""+this->listGameConfigs->GetString(iIndex)+"\"?",
                   wxMessageBoxCaptionStr,
                   wxYES_NO | wxCENTER,
-                  this)==wxYES)
+                  this) == wxYES)
   {
     if(!deleteFolderRecursive(strPath))
     {
-      wxMessageBox("Failed to delete " + strPath,wxMessageBoxCaptionStr,
+      wxMessageBox("Failed to delete "+strPath,wxMessageBoxCaptionStr,
                    wxOK | wxCENTER | wxICON_EXCLAMATION,this);
     }
   }
   this->UpdateConfigList();
 }
 
-void wxWinMain::OnEditConfig(wxCommandEvent& WXUNUSED(event))
+void wxWinMain::OnEditConfigStartPCSX2(wxCommandEvent &WXUNUSED(event))
 {
   string strCmd;
   int iIndex;
-  if((iIndex=this->listGameConfigs->GetSelection())==wxNOT_FOUND)
+  if((iIndex=this->listGameConfigs->GetSelection()) == wxNOT_FOUND)
     return;
 
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   pcsx2Tool_m->CreateCommandLine_PCSX2StartWithCFG((iIndex)?this->listGameConfigs->GetString(iIndex).ToStdString():"",
-                                 strCmd);
+                                                   strCmd);
 
-  DEBUG_WXPUTS("Starting: " + strCmd);
+  DEBUG_WXPUTS("Starting: "+strCmd);
 
   if(wxExecute(strCmd,wxEXEC_ASYNC) < 0)
   {
-    wxMessageBox("Failed to start " + strCmd,
+    wxMessageBox("Failed to start "+strCmd,
                  wxMessageBoxCaptionStr,
-                 wxOK|wxCENTER|wxICON_EXCLAMATION,
+                 wxOK | wxCENTER | wxICON_EXCLAMATION,
                  this);
   }
 }
 
-void wxWinMain::OnClose(wxCloseEvent& WXUNUSED(event))
+void wxWinMain::OnClose(wxCloseEvent &WXUNUSED(event))
 {
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
   if(!pcsx2Tool_m->SaveToolConfig())
   {
-    wxMessageDialog confirmMe(this,
-                              wxString::Format("Failed to save tool configuration to %s, Quit anyway?",pcsx2Tool_m->GetToolCFGPath()),
-                              wxMessageBoxCaptionStr,
-                              wxYES_NO);
-    switch(confirmMe.ShowModal())
+    if(wxMessageBox("Failed to save tool configuration file to " + pcsx2Tool_m->GetToolCFGPath() + ", Quit anyway?",
+                    "Saving Configuration failed",
+                    wxYES_NO | wxCENTER | wxICON_EXCLAMATION,
+                    this) == wxNO)
     {
-      case wxID_NO:
-        return;
-      case wxID_YES:
-        break;
+      return;
     }
   }
   this->Destroy();
