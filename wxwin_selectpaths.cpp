@@ -5,6 +5,7 @@
 
 #include "wxwin_selectpaths.h"
 #include "wxwin_functions.h"
+#include "wxwin_main.h"
 
 enum
 {
@@ -280,6 +281,6 @@ void wxWinPathConfigurator::OnClose(wxCloseEvent& WXUNUSED(event))
         return;
     }
   }
-  this->GetParent()->Show(true); /* Update winMain to show contents, if needed */
+  wxGetApp().GetTopWindow()->Update(); /* Update winMain to show contents, if needed */
   this->Show(false);
 }
