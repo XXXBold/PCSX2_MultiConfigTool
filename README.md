@@ -14,15 +14,20 @@ Let me know if you have suggestions, wishes, find a bug or if you need help or m
 ## Build instructions
 From Version >=0.6, the buildsystem was changed to meson. There are scripts available to invoke the building process for both Linux and Windows. For Windows, MSYS2 is needed in order to use the script.
 
-### Linux
+### Linux (Ubuntu 18.04 and similar)
+- Install Packages from repo: `sudo apt install build-essential libwxgtk3.0-gtk3-dev python3-pip ninja-build`
+- Install meson via Python pip: `pip3 install meson`
+- Relog to recreate path variable for meson
+- Navigate to folder containing this project
+- Execute `./build_linux.sh`, which should build everything
 
 ### Windows/MSYS2
 - Download MSYS2 from https://www.msys2.org/ (the x86_64 setup, 32-bit is not supported because 32-bit only OS are not a thing anymore on the desktop).
 - Run setup to install MSYS2
 - Execute MSYS2 using the shortcut "MSYS2 Mingw 64-bit"
-- Update the Packages: `pacman -Suyy`
-- install the necessary Packages: `pacman -S `
-- Within the MSYS2-shell, navigate to your local folder, containing this project.
+- Update the Packages: `pacman -Suyy`, if requested, close the programm. Open again, run `pacman -Suyy` a second time (Can take a while). Packages should now be up to date.
+- Install the necessary Packages: `pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-wxWidgets ninja-vim mingw-w64-x86_64-meson` This will take a while.
+- Within the MSYS2 (MinGW64)-shell, navigate to your local folder, containing this project.
 - Execute `./build_windows.sh`, which should build everything
 
 ## Releases
