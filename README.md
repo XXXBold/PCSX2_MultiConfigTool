@@ -1,6 +1,6 @@
 # PCSX2_MultiConfigTool
 
-This tool can be used to manage diffrent configs and create Shortcuts for direct starting games with PCSX2 https://github.com/PCSX2/pcsx2.
+This tool can be used to manage diffrent configs and create Shortcuts for direct starting games with PCSX2.
 
 The tool will not modify your original PCSX2 data without your knowledge, if you don't want to use it anymore, just delete it and continue using PCSX2 as before.
 
