@@ -42,6 +42,7 @@ From Version >=0.6, the buildsystem was changed to meson. There are scripts avai
 - code cleanup
 
 ## Credits & References
+- PCSX2 Playstation 2 Emulator: https://pcsx2.net/ / https://github.com/PCSX2/pcsx2
 - wxWidgets Library: http://www.wxwidgets.org/
 - wxFormBuilder: https://github.com/wxFormBuilder/wxFormBuilder
 - meson: https://mesonbuild.com/index.html
