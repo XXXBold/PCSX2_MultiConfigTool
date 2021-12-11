@@ -5,4 +5,4 @@
 
 build_dir=build_linux
 
-meson setup $build_dir --buildtype=release --default-library=static --warnlevel=1 && ninja -C $build_dir
+meson setup $build_dir --buildtype=release --warnlevel=1 && ninja -C $build_dir
