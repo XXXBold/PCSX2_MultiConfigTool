@@ -3,19 +3,21 @@ project('PCSX2-MultiConfigTool',
         meson_version : '>=0.52.0')
 
 #Setup local variables
+OF_ExeName = 'pcsx2-multiconfigtool'
 IF_Lic = './' + 'LICENSE'
 OF_Lic = meson.current_build_dir() + '/license.h' #The builddir doesn't need including via 'include_directories', so the file is found by the compiler
 
 src_tool = ['./src/appconfig.c',
             './src/inifile.c',
             './src/pcsx2_multiconfigtool.cpp']
-inc_tool = include_directories('./src')
 
 src_gui = ['./src/UI_wx/wxwin_functions.cpp',
            './src/UI_wx/wxwin_main.cpp',
            './src/UI_wx/wxwin_selectpaths.cpp']
+           
+#Include directories
+inc_tool = include_directories('./src')
 inc_gui = include_directories('./src/UI_wx')
-
 inc_res = include_directories('./resources')
 
 cmdparam_xxd = ['-i',
@@ -43,9 +45,9 @@ if build_machine.system() == 'windows'
     wxDep = dependency('wxwidgets',
                        version : '>=3.0.0',
                        method : 'config-tool',
-                       static : true, # this is currently not working
+                       static : true,
                        required : true,
-                       modules : ['--static', 'std', 'stc']) #the '--static' is a temporary hack to enable static linking
+                       modules : ['std', 'stc'])
 
     wxResCmpArgs = []
 
@@ -72,12 +74,12 @@ run_command('xxd',
             cmdparam_xxd,
             check : true)
 
-#modify generated licensefile
+#modify generated licensefile (make it a valid .c-file)
 run_command('sed',
             cmdparam_sed,
             check : true)
 
-executable('PCSX2-MulticonfigTool',
+executable(OF_ExeName,
            sources : [src_gui, src_tool],
            include_directories : [inc_gui, inc_tool, inc_res],
            dependencies : wxDep,
