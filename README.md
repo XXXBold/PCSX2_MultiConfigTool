@@ -31,12 +31,15 @@ From Version >=0.6, the buildsystem was changed to meson. There are scripts avai
 - Execute `./build_windows.sh`, which should build everything
 
 ## Releases
-- 0.1: First Release
-- 0.2-beta: Added Some new options
-- 0.3-beta: Added support for linux, updated to new codebase
-- 0.4-beta: Improved UI Controls, enhanced shortcut creation (Overwrite-confirm dialog), ask to set executable bit for linux version directly
-- 0.5-beta: Added more options for creating shortcuts, Updated icon, is now shown correctly, added license, for linux: Update to wxWidgets based on GTK3
+- 0.7-beta: Improved window (re) sizeing, sometimes not all UI-Elements were visible, improved process spawn handling (Now throws error if executable path doesn't exist), changed executable name to lowercase.
 - 0.6-beta: Added Better handling of PCSX2-Process spawning, minor UI fixes, some cleanups. Reorganized files, meson is now used as the build system. Buildscripts are now available for both platforms.
+- 0.5-beta: Added more options for creating shortcuts, Updated icon, is now shown correctly, added license, for linux: Update to wxWidgets based on GTK3
+- 0.4-beta: Improved UI Controls, enhanced shortcut creation (Overwrite-confirm dialog), ask to set executable bit for linux version directly
+- 0.3-beta: Added support for linux, updated to new codebase
+- 0.2-beta: Added Some new options
+- 0.1: First Release
+
+
 
 ## TODOs
 - code cleanup
