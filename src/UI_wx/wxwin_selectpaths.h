@@ -29,7 +29,7 @@ class wxWinPathConfigurator : public wxFrame
                           wxWindowID id = wxID_ANY,
                           const wxString& title = wxEmptyString,
                           const wxPoint& pos = wxDefaultPosition,
-                          const wxSize& size = wxSize( 640,330 ),
+                          const wxSize& size = wxSize( -1,-1 ),
                           long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL);
 
     bool PathConfigIsValid(void);

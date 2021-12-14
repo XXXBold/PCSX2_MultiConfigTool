@@ -25,7 +25,7 @@ class wxWinMain : public wxFrame
               wxWindowID id = wxID_ANY,
               const wxString& title = wxEmptyString,
               const wxPoint& pos = wxDefaultPosition,
-              const wxSize& size = wxSize( 515,280 ),
+              const wxSize& size = wxSize( -1,-1 ),
               long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL);
 
     void UpdateConfigList();
@@ -49,7 +49,7 @@ class wxWinMain : public wxFrame
     void OnNewConfigSave(wxCommandEvent& event);
     void OnNewConfigCancel(wxCommandEvent& event);
     void OnConfigDelete(wxCommandEvent& event);
-    void OnEditConfigStartPCSX2(wxCommandEvent& event);
+    void OnStartPCSX2WithConfig(wxCommandEvent& event);
 
     void OnClose(wxCloseEvent& event);
 
@@ -63,7 +63,7 @@ class wxWinMain : public wxFrame
     int iCurrSelection;
     long lPCSX2ProcessPid;
     const wxString strTextBtnStartPCSX2_Running=wxT("PCSX2 is running with config ");
-    const wxString strTextBtnStartPCSX2_NotRunning=wxT("Start PCSX2 to Edit your Settings for the selected Config");
+    const wxString strTextBtnStartPCSX2_NotRunning=wxT("Start PCSX2 with selected config");
 
     void EnableEditControls(bool enable);
 

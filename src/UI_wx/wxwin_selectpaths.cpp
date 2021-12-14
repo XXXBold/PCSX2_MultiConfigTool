@@ -128,6 +128,7 @@ wxWinPathConfigurator::wxWinPathConfigurator(wxWindow* parent,
 
   this->SetSizer( layoutVertical );
   this->Layout();
+  layoutVertical->Fit( this );
 
   this->Centre( wxBOTH );
 }
@@ -152,6 +153,7 @@ bool wxWinPathConfigurator::Show(bool show,
     this->txtPCSX2CFGPath->SetValue(pcsx2Tool_m->GetPCSX2CFGPath());
     this->txtUserCFGPath->SetValue(pcsx2Tool_m->GetUserCFGPath());
   }
+  wxWindow::Fit();
   return(wxFrame::Show(show));
 }
 

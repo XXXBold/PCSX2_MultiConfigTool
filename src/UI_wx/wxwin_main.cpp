@@ -58,7 +58,7 @@ EVT_BUTTON(BTN_RenameConfig,wxWinMain::OnRenameConfig)
 EVT_BUTTON(BTN_NewConfigSave,wxWinMain::OnNewConfigSave)
 EVT_BUTTON(BTN_NewConfigCancel,wxWinMain::OnNewConfigCancel)
 EVT_BUTTON(BTN_ConfigDelete,wxWinMain::OnConfigDelete)
-EVT_BUTTON(BTN_ConfigStartPCSX2,wxWinMain::OnEditConfigStartPCSX2)
+EVT_BUTTON(BTN_ConfigStartPCSX2,wxWinMain::OnStartPCSX2WithConfig)
 
 EVT_TIMER(Timer_WinMain,wxWinMain::OnTimerTick)
 
@@ -69,8 +69,11 @@ IMPLEMENT_APP(PCSX2Tool_GUI)
 
 bool PCSX2Tool_GUI::OnInit(void)
 {
+
   bool bFirstStart=false;
+
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
+
   if(!wxApp::OnInit())
     return(false);
 
@@ -109,6 +112,7 @@ bool PCSX2Tool_GUI::OnInit(void)
                                      APP_DISPLAY_NAME);
   winMain->wxPathCfg = new wxWinPathConfigurator(winMain,wxID_ANY,"Select Paths");
   winMain->Show(true);
+  winMain->Update();
   if(bFirstStart)
   {
     if(wxMessageBox("This seems to be the First Launch of the " APP_DISPLAY_NAME ", do you want to Setup Paths now?",
@@ -188,7 +192,7 @@ wxWinMain::wxWinMain(wxWindow *parent,
 
   layCFGEdit->Add( laySaveCancelBtn, 1, wxEXPAND, 0 );
 
-  btnConfigStartPCSX2 = new wxButton( this, BTN_ConfigStartPCSX2, wxT("Start PCSX2 to Edit your Settings for the selected Config"), wxDefaultPosition, wxDefaultSize, 0 );
+  btnConfigStartPCSX2 = new wxButton( this, BTN_ConfigStartPCSX2, wxT("Start PCSX2 with selected Config"), wxDefaultPosition, wxDefaultSize, 0 );
   layCFGEdit->Add( btnConfigStartPCSX2, 0, wxALL, 5 );
 
 
@@ -241,6 +245,7 @@ wxWinMain::wxWinMain(wxWindow *parent,
 
   wxTimerMain.SetOwner( this, Timer_WinMain );
 
+
   /* Loaded in ressource file (.rc) on Windows, for linux: included above */
   this->appIcon=wxICON(pcsx2tool_logo);
 }
@@ -258,7 +263,6 @@ bool wxWinMain::Show(bool show)
     this->menuItemStartForceConsole->Check(pcsx2Tool_m->GetOptionStartForceConsole());
     this->menuItemStartNoHacks->Check(pcsx2Tool_m->GetOptionStartNoHacks());
 
-    this->Update();
     this->Centre(wxBOTH);
 #ifdef __WXGTK__ /* GTK has a native control for licenses */
     this->wAbout.SetLicense(ucaLicense_m);
@@ -283,7 +287,7 @@ bool wxWinMain::Show(bool show)
                                 "For proper functionality, make sure all Paths are set correctly.\n"
                                 "\n"
                                 "If you need help, found a bug, or have ideas for new features or improvements, visit the website of the Project, and let me know.\n");
-    this->wAbout.SetCopyright("(C) 2018-2020 by XXXBold");
+    this->wAbout.SetCopyright("(C) 2018-2021 by XXXBold");
 
     this->wAbout.SetWebSite(APP_PROJECT_HOMEPAGE);
     this->wAbout.AddDeveloper(APP_PROJECT_DEVELOPER);
@@ -303,14 +307,17 @@ void wxWinMain::Update()
   }
   else
   {
+    this->UpdateConfigList();
     this->menuItemCreateGameShortcut->Enable(true);
     this->layCFGEdit->Show(true);
-    this->txtNewCFGName->Show(false);
     this->laySaveCancelBtn->Show(false);
-    this->UpdateConfigList();
+
     this->layCFGEdit->Layout(); // Recalculate layout
+    this->Fit();
+    this->txtNewCFGName->Show(false); //hiding after layout fixes window beeing too small at startup
   }
-  wxFrame::Update();
+
+  wxWindow::Update();
 }
 
 void wxWinMain::UpdateConfigList()
@@ -492,6 +499,7 @@ void wxWinMain::ShowCfgNameEdit(const wxString &name,
   /* Disable other elements */
   this->btnConfigStartPCSX2->Show(false);
   this->EnableEditControls(false);
+  this->Fit();
 
   this->txtNewCFGName->SetValue(name);
   this->txtNewCFGName->SetFocus();
@@ -505,6 +513,7 @@ void wxWinMain::HideCfgNameEdit(void)
   this->laySaveCancelBtn->Show(false);
   this->btnConfigStartPCSX2->Show(true);
 
+  this->Fit();
   this->EnableEditControls(true);
 }
 
@@ -595,7 +604,7 @@ void wxWinMain::OnConfigDelete(wxCommandEvent &WXUNUSED(event))
   this->UpdateConfigList();
 }
 
-void wxWinMain::OnEditConfigStartPCSX2(wxCommandEvent &WXUNUSED(event))
+void wxWinMain::OnStartPCSX2WithConfig(wxCommandEvent &WXUNUSED(event))
 {
   string strCmd;
   int iIndex;
@@ -603,6 +612,18 @@ void wxWinMain::OnEditConfigStartPCSX2(wxCommandEvent &WXUNUSED(event))
     return;
 
   DEBUG_WXPUTS(__PRETTY_FUNCTION__);
+
+  strCmd=pcsx2Tool_m->GetPCSX2ExePath();
+  if(!wxFileExists(wxString(strCmd)))
+  {/* Cannot start if executable doesn't exist */
+    wxMessageBox(wxString("PCSX2 Executable \"" + strCmd + "\" not found, can't launch.\n"
+                 "Please setup paths correctly (File->Set Paths...)"),
+                 wxMessageBoxCaptionStr,
+                 wxOK | wxICON_EXCLAMATION | wxCENTER,
+                 this);
+    return;
+  }
+
   pcsx2Tool_m->CreateCommandLine_PCSX2StartWithCFG((iIndex)?this->listGameConfigs->GetString(iIndex).ToStdString():"",
                                                    strCmd);
 
@@ -620,6 +641,7 @@ void wxWinMain::OnEditConfigStartPCSX2(wxCommandEvent &WXUNUSED(event))
   }
   this->btnConfigStartPCSX2->SetLabel(this->strTextBtnStartPCSX2_Running + "\"" +this->listGameConfigs->GetString(iIndex) + "\"...");
   this->btnConfigStartPCSX2->Enable(false);
+  this->btnConfigStartPCSX2->Fit(); // Fit button to text size
   this->TimerEnable(true);
   this->EnableEditControls(false); // Disable edit controls, if PCSX2 is started
   DEBUG_WXPUTS(wxString::Format("Started process with PID %ld",
@@ -654,5 +676,6 @@ void wxWinMain::OnTimerTick(wxTimerEvent &WXUNUSED(event))
   this->EnableEditControls(true); // reenable edit controls, if PCSX2 is closed
   this->TimerEnable(false);
   this->btnConfigStartPCSX2->SetLabel(this->strTextBtnStartPCSX2_NotRunning);
+  this->btnConfigStartPCSX2->Fit(); // Fit button to text size
 }
 
