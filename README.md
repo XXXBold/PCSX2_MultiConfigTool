@@ -1,3 +1,5 @@
+### Because in recent versions of PCSX2 (>=1.7-dev with the QT-interface) there are game-specific options, this application is no longer needed and I archive it at this point. Feel free to use it for older versions, but don't expect more maintenance.
+
 # PCSX2_MultiConfigTool
 
 This tool can be used to manage diffrent configs and create Shortcuts for direct starting games with PCSX2.
